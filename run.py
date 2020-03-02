@@ -3,27 +3,33 @@ import sys
 import time
 import random
 import webbrowser
-from PyQt4 import  QtGui, QtCore  
-from PyQt4.QtCore import *
-from PyQt4.QtGui import *
-from PyQt4.QtCore import SIGNAL as signal
-from win32gui import *
+from PyQt5 import  QtGui, QtCore  
+from PyQt5.QtCore import *
+from PyQt5.QtGui import *
+import win32gui
+import win32api
+import win32com
 from xml.etree import ElementTree
 
+from PyQt5.QtWidgets import QSystemTrayIcon, QApplication, QWidget, QAction, qApp, QMenu, QDesktopWidget, QLabel
+
+'''
 codec = QTextCodec.codecForName("utf8") 
 QTextCodec.setCodecForLocale(codec)
 QTextCodec.setCodecForCStrings(codec) 
 QTextCodec.setCodecForTr(codec)
+'''
+
 
 
 #-----------------------------------------------------------------------------------------------------------------------------------
 
-class myMain(QtGui.QWidget):
+class myMain(QWidget):
     def __init__(self, parent=None):
-        QtGui.QWidget.__init__(self, parent)
+        QWidget.__init__(self, parent)
     
         #系统托盘图标
-        self.trayIcon = QtGui.QSystemTrayIcon(self)
+        self.trayIcon = QSystemTrayIcon(self)
         icon = QtGui.QIcon('img/icon.png')
         self.trayIcon.setIcon(icon)
         self.trayIcon.show()
@@ -31,14 +37,14 @@ class myMain(QtGui.QWidget):
         #trayIcon.activated.connect(trayIconClick)
 
         #添加系统托盘菜单
-        trayIcon_Action_AddOne = QtGui.QAction(self.tr("再来一发(&A)"), self,triggered=trayIcon_AddOne)
-        trayIcon_Action_JustOne = QtGui.QAction(self.tr("只留一只(&O)"), self,triggered=trayIcon_JustOne)
-        trayIcon_Action_ClearAll = QtGui.QAction(self.tr("统统不见(&C)"), self,triggered=trayIcon_ClearAll)
-        trayIcon_Action_About = QtGui.QAction(self.tr("关于"), self,triggered=self.showAbout)
-        trayIcon_Action_Site = QtGui.QAction(self.tr("更新/官方网站"), self,triggered=self.showSite)
-        trayIcon_Action_Quit = QtGui.QAction(self.tr("退出程序(&Q)"), self,triggered=QtGui.qApp.quit)
+        trayIcon_Action_AddOne = QAction(self.tr("再来一发(&A)"), self,triggered=trayIcon_AddOne)
+        trayIcon_Action_JustOne = QAction(self.tr("只留一只(&O)"), self,triggered=trayIcon_JustOne)
+        trayIcon_Action_ClearAll = QAction(self.tr("统统不见(&C)"), self,triggered=trayIcon_ClearAll)
+        trayIcon_Action_About = QAction(self.tr("关于"), self,triggered=self.showAbout)
+        trayIcon_Action_Site = QAction(self.tr("更新/官方网站"), self,triggered=self.showSite)
+        trayIcon_Action_Quit = QAction(self.tr("退出程序(&Q)"), self,triggered=qApp.quit)
         
-        trayIconMenu = QtGui.QMenu()
+        trayIconMenu = QMenu()
         trayIconMenu.addAction(trayIcon_Action_AddOne)
         trayIconMenu.addAction(trayIcon_Action_JustOne)
         trayIconMenu.addAction(trayIcon_Action_ClearAll)
@@ -58,10 +64,10 @@ class myMain(QtGui.QWidget):
 
 #-----------------------------------------------------------------------------------------------------------------------------------
 
-class myDesktopPet(QtGui.QWidget):
+class myDesktopPet(QWidget):
     
     def __init__(self, parent=None):
-        QtGui.QWidget.__init__(self, parent)
+        QWidget.__init__(self, parent)
 
         #加载剧本
         self.loadScript()
@@ -99,7 +105,7 @@ class myDesktopPet(QtGui.QWidget):
         
         #显示图片
         
-        self.lbl = QtGui.QLabel(self)
+        self.lbl = QLabel(self)
         self.lbl.move(0, 0)
 
         self.setPic('falling','up-left')
@@ -126,18 +132,18 @@ class myDesktopPet(QtGui.QWidget):
         #菜单变量
         self.rightButton=False
         #右键菜单
-        self.popMenu= QtGui.QMenu()
+        self.popMenu= QMenu()
         if not self.doNotMove:
             #-不许动
-            doNotMoveAction=QtGui.QAction(self.tr("不许动(&Z)"), self,triggered=self.setDoNotMove)
+            doNotMoveAction=QAction(self.tr("不许动(&Z)"), self,triggered=self.setDoNotMove)
             self.popMenu.addAction(doNotMoveAction)
         else:
             #-可以动
-            doNotMoveAction=QtGui.QAction(self.tr("自己一边儿玩去吧(&Z)"), self,triggered=self.setDoNotMove)
+            doNotMoveAction=QAction(self.tr("自己一边儿玩去吧(&Z)"), self,triggered=self.setDoNotMove)
             self.popMenu.addAction(doNotMoveAction)
             
         #-退出
-        quitFAction=QtGui.QAction(self.tr("关闭我(&Q)"), self,triggered=self.close)
+        quitFAction=QAction(self.tr("关闭我(&Q)"), self,triggered=self.close)
         self.popMenu.addAction(quitFAction)
 
     #自定义：不许动切换
@@ -179,7 +185,7 @@ class myDesktopPet(QtGui.QWidget):
 
     #自定义：初始在屏幕中心
     def randomSit(self):
-        screen = QtGui.QDesktopWidget().screenGeometry()
+        screen = QDesktopWidget().screenGeometry()
         size =  self.geometry()
         self.move((screen.width()-size.width())*random.random(), (screen.height()-size.height())*random.random())
 
@@ -207,9 +213,9 @@ class myDesktopPet(QtGui.QWidget):
 
     #自定义：更新工作区大小
     def updateWorkArea(self):
-        h=FindWindow("Shell_TrayWnd","")
-        r=GetWindowRect(h)
-        screen=QtGui.QDesktopWidget().screenGeometry()
+        h=win32gui.FindWindow("Shell_TrayWnd","")
+        r=win32gui.GetWindowRect(h)
+        screen=QDesktopWidget().screenGeometry()
 
         self.workArea['x']['a']=0
         self.workArea['x']['b']=screen.width()
@@ -257,10 +263,10 @@ class myDesktopPet(QtGui.QWidget):
         
         Mx=False
         My=False
-        if tmp_node.attrib.has_key('Mirror-X'):
+        if 'Mirror-X' in tmp_node.attrib:
             if tmp_node.attrib['Mirror-X']=='True':
                 Mx=True
-        if tmp_node.attrib.has_key('Mirror-Y'):
+        if 'Mirror-Y' in tmp_node.attrib:
             if tmp_node.attrib['Mirror-Y']=='True':
                 My=True
 
@@ -342,7 +348,7 @@ class myDesktopPet(QtGui.QWidget):
         self.updateWorkArea()
         
         size =  self.geometry()
-        if (size.top()<self.workArea['y']['b']) and (size.left>self.workArea['x']['a']-64) and (size.left<(self.workArea['x']['b']-64)):
+        if (size.top()<self.workArea['y']['b']) and (size.left()>self.workArea['x']['a']-64) and (size.left()<(self.workArea['x']['b']-64)):
             #尼玛忘了为什么要写这个
             if self.petStatus['Status']!='falling' and self.petStatus['Status']!='floor':
                 #self.move(size.left(),self.workArea['y']['b'])
@@ -466,10 +472,10 @@ class myDesktopPet(QtGui.QWidget):
                 #更新图片
                 self.setPic(self.petStatus['Status'],self.petStatus['Script'],iPic)
                 #初始化移动Vx Vy
-                if i.attrib.has_key('XMoveMax') and i.attrib.has_key('XMoveMin'):
+                if 'XMoveMax' in i.attrib and 'XMoveMin' in i.attrib:
                     tmp_Vx=(float(i.attrib['XMoveMin'])+random.random()*(float(i.attrib['XMoveMax'])-float(i.attrib['XMoveMin'])))
                     self.petStatus['Vx']=tmp_Vx
-                if i.attrib.has_key('YMoveMax') and i.attrib.has_key('YMoveMin'):
+                if 'YMoveMax' in i.attrib and 'YMoveMin' in i.attrib:
                     tmp_Vy=(float(i.attrib['YMoveMin'])+random.random()*(float(i.attrib['YMoveMax'])-float(i.attrib['YMoveMin'])))
                     self.petStatus['Vy']=tmp_Vy
                     
@@ -501,7 +507,7 @@ class myDesktopPet(QtGui.QWidget):
         
 	#判断一次Script执行完毕
         if nowTime>actionTime:
-            if node.attrib.has_key('repeatTimeMax') and node.attrib.has_key('repeatTimeMin'):
+            if 'repeatTimeMax' in node.attrib and 'repeatTimeMin' in node.attrib:
                 if self.petStatus['ToRepeat']==0:
                     self.petStatus['ToRepeat']=round(int(node.attrib['repeatTimeMin'])\
                                                     +random.random()*(int(node.attrib['repeatTimeMax'])-int(node.attrib['repeatTimeMin'])))
@@ -526,13 +532,13 @@ class myDesktopPet(QtGui.QWidget):
         node=self.root.find(xPathStr)
 
         #是否指向状态及脚本
-        if node.attrib.has_key('toStatus') and node.attrib.has_key('toScript'):
+        if 'toStatus' in node.attrib and 'toScript' in node.attrib:
             #速度继承
-            if node.attrib.has_key('toVx') and node.attrib.has_key('toVy'):
+            if 'toVx' in node.attrib and 'toVy' in node.attrib:
                 self.setPetStatus(node.attrib['toStatus'],node.attrib['toScript'],self.petStatus['Vx'],self.petStatus['Vy'])
-            elif node.attrib.has_key('toVx'):
+            elif 'toVx' in node.attrib:
                 self.setPetStatus(node.attrib['toStatus'],node.attrib['toScript'],self.petStatus['Vx'],0)
-            elif node.attrib.has_key('toVy'):
+            elif 'toVy' in node.attrib:
                 self.setPetStatus(node.attrib['toStatus'],node.attrib['toScript'],0,self.petStatus['Vy'])
             else:  
                 self.setPetStatus(node.attrib['toStatus'],node.attrib['toScript'])
@@ -578,7 +584,7 @@ def main():
     global petList
     petList=[]
     
-    app = QtGui.QApplication(sys.argv)
+    app = QApplication(sys.argv)
 
     #总控制模块
     x=myMain()
