@@ -40,8 +40,9 @@ class myMain(QWidget):
         trayIcon_Action_AddOne = QAction(self.tr("再来一发(&A)"), self,triggered=trayIcon_AddOne)
         trayIcon_Action_JustOne = QAction(self.tr("只留一只(&O)"), self,triggered=trayIcon_JustOne)
         trayIcon_Action_ClearAll = QAction(self.tr("统统不见(&C)"), self,triggered=trayIcon_ClearAll)
-        trayIcon_Action_About = QAction(self.tr("关于"), self,triggered=self.showAbout)
-        trayIcon_Action_Site = QAction(self.tr("更新/官方网站"), self,triggered=self.showSite)
+        # the original "about" and "site" that I don't need
+        # trayIcon_Action_About = QAction(self.tr("关于"), self,triggered=self.showAbout)
+        # trayIcon_Action_Site = QAction(self.tr("更新/官方网站"), self,triggered=self.showSite)
         trayIcon_Action_Quit = QAction(self.tr("退出程序(&Q)"), self,triggered=qApp.quit)
         
         trayIconMenu = QMenu()
@@ -49,18 +50,22 @@ class myMain(QWidget):
         trayIconMenu.addAction(trayIcon_Action_JustOne)
         trayIconMenu.addAction(trayIcon_Action_ClearAll)
         trayIconMenu.addSeparator()
-        trayIconMenu.addAction(trayIcon_Action_About)
-        trayIconMenu.addAction(trayIcon_Action_Site)
-        trayIconMenu.addSeparator()
-        trayIconMenu.addAction(trayIcon_Action_Quit)
         
+        # corresponding "about" and "site" button
+        # trayIconMenu.addAction(trayIcon_Action_About)
+        # trayIconMenu.addAction(trayIcon_Action_Site)
+        # trayIconMenu.addSeparator()
+        trayIconMenu.addAction(trayIcon_Action_Quit)
+      
         self.trayIcon.setContextMenu(trayIconMenu)
-
+'''
+    # defination of "about" and "site"
     def showAbout(self):
         self.trayIcon.showMessage(self.tr('关于 DP桌宠'),self.tr("版本:beta 2(公测版) / 提意见:suom@qq.com"))
 
     def showSite(self):
         webbrowser.open_new_tab('http://www.dpmoe.com/')
+'''
 
 #-----------------------------------------------------------------------------------------------------------------------------------
 
@@ -115,11 +120,7 @@ class myDesktopPet(QWidget):
 
         #设置菜单
         self.setPopMenu()
-
-
         
-        #窗体图标
-        self.setWindowIcon(QtGui.QIcon('img\icon.png'))
         #设置大小
         self.resize(128, 128)
         #显示窗体
@@ -158,7 +159,7 @@ class myDesktopPet(QWidget):
     #自定义：加载配置文件
     def loadScript(self):
         try:
-            self.scriptXML=open("img\setting.xml").read()
+            self.scriptXML=open("img\setting.xml","rb").read()
         except:
             self.scriptXML=self.loadDefaultScript()
             
@@ -166,7 +167,59 @@ class myDesktopPet(QWidget):
 
     #自定义：返回默认配置
     def loadDefaultScript(self):
-        return """<?xml version="1.0" encoding="utf-8"?><root version='2'><status name='catch'><script name='general-left' type='static'><action pic='shime5.png'></action></script><script name='throw-left' type='static'><action pic='shime7.png'></action></script><script name='general-right' type='static'><action pic='shime5.png' Mirror-X='True'></action></script><script name='throw-right' type='static'><action pic='shime7.png' Mirror-X='True'></action></script></status><status name='falling'><script name='up-left' type='static'><action pic='shime5.png'></action></script><script name='down-left' type='static'><action pic='shime4.png'></action></script><script name='up-right' type='static'><action pic='shime5.png' Mirror-X='True'></action></script><script name='down-right' type='static'><action pic='shime4.png' Mirror-X='True'></action></script></status><status name='floor'><script name='general-left' type='static' pOut='100'><action pic='shime1.png'></action></script><script name='general-right' type='static' pOut='100'><action pic='shime1.png' Mirror-X='True'></action></script><script name='toFloor-left' type='dynamic'><action pic='shime20.png' useTime='400'></action><action pic='shime18.png' useTime='200'></action></script><script name='toFloor-right' type='dynamic'><action pic='shime20.png' useTime='400' Mirror-X='True'></action><action pic='shime18.png' useTime='200' Mirror-X='True'></action></script><script name='walk-left' type='dynamic' repeatTimeMax='20' repeatTimeMin='1' p='20'><action pic='shime2.png' useTime='300' XMoveMax='-1' XMoveMin='-1'></action><action pic='shime3.png' useTime='300' XMoveMax='-1' XMoveMin='-1'></action></script><script name='walk-right' type='dynamic' repeatTimeMax='20' repeatTimeMin='1' p='20'><action pic='shime2.png' useTime='300' XMoveMax='1' XMoveMin='1' Mirror-X='True'></action><action pic='shime3.png' useTime='300' XMoveMax='1' XMoveMin='1' Mirror-X='True'></action></script><script name='Sit' type='dynamic' p='10'><action pic='shime18.png' useTime='300'></action><action pic='shime11.png' useTime='3000'></action></script><script name='sleeplySit' type='dynamic' p='10'><action pic='shime18.png' useTime='300'></action><action pic='shime20.png' useTime='1000'></action><action pic='shime30.png' useTime='1500'></action><action pic='shime31.png' useTime='500'></action><action pic='shime32.png' useTime='500'></action><action pic='shime30.png' useTime='1500'></action><action pic='shime31.png' useTime='500'></action><action pic='shime32.png' useTime='500'></action><action pic='shime32.png' useTime='3000'></action><action pic='shime33.png' useTime='3000'></action><action pic='shime32.png' useTime='3000'></action><action pic='shime33.png' useTime='3000'></action><action pic='shime20.png' useTime='1000'></action><action pic='shime18.png' useTime='300'></action></script><script name='jump' type='dynamic' p='10' repeatTimeMax='3' repeatTimeMin='1'><action pic='shime49.png' useTime='300'></action><action pic='shime47.png' useTime='100' XMoveMax='-2' XMoveMin='-2' YMoveMax='-1' YMoveMin='-1'></action><action pic='shime47.png' useTime='50' XMoveMax='-2' XMoveMin='-2' YMoveMax='-0.5' YMoveMin='-0.5'></action><action pic='shime47.png' useTime='50' XMoveMax='-2' XMoveMin='-2' YMoveMax='0.5' YMoveMin='0.5'></action><action pic='shime47.png' useTime='100' XMoveMax='-2' XMoveMin='-2' YMoveMax='1' YMoveMin='1'></action><action pic='shime48.png' useTime='300'></action></script><script name='fly-left' type='dynamic' p='2'><action pic='shime49.png' useTime='1000'></action><action pic='shime47.png' useTime='200' XMoveMax='-2' XMoveMin='-2' YMoveMax='-1' YMoveMin='-1'></action><action pic='shime22.png' useTime='1000000' XMoveMax='-5' XMoveMin='-5' YMoveMax='-2' YMoveMin='-2'></action></script><script name='fly-right' type='dynamic' p='2'><action pic='shime49.png' useTime='1000' Mirror-X='True'></action><action pic='shime47.png' useTime='200' XMoveMax='2' XMoveMin='2' YMoveMax='-1' YMoveMin='-1' Mirror-X='True'></action><action pic='shime22.png' useTime='1000000' XMoveMax='5' XMoveMin='5' YMoveMax='-2' YMoveMin='-2' Mirror-X='True'></action></script></status><status name='wall-left'><script name='general' type='static' pOut='300'><action pic='shime12.png'></action></script><script name='up' type='dynamic' p='30' repeatTimeMax='6' repeatTimeMin='1' ><action pic='shime13.png' useTime='300' YMoveMax='-1' YMoveMin='-1'></action><action pic='shime14.png' useTime='300' YMoveMax='-1' YMoveMin='-1'></action></script><script name='down' type='dynamic' p='30' repeatTimeMax='5' repeatTimeMin='1' ><action pic='shime13.png' useTime='300' YMoveMax='1' YMoveMin='1'></action><action pic='shime14.png' useTime='300' YMoveMax='1' YMoveMin='1'></action></script><script name='jump' type='dynamic' p='5' toStatus='falling' toScript='down-left' toVx='True'><action pic='shime13.png' useTime='100' XMoveMax='5' XMoveMin='2'></action></script></status><status name='wall-right'><script name='general' type='static' pOut='300'><action pic='shime12.png' Mirror-X='True'></action></script><script name='up' type='dynamic' p='30' repeatTimeMax='6' repeatTimeMin='1' ><action pic='shime13.png' useTime='300' YMoveMax='-1' YMoveMin='-1' Mirror-X='True'></action><action pic='shime14.png' useTime='300' YMoveMax='-1' YMoveMin='-1' Mirror-X='True'></action></script><script name='down' type='dynamic' p='30' repeatTimeMax='5' repeatTimeMin='1' ><action pic='shime13.png' useTime='300' YMoveMax='1' YMoveMin='1' Mirror-X='True'></action><action pic='shime14.png' useTime='300' YMoveMax='1' YMoveMin='1' Mirror-X='True'></action></script><script name='jump' type='dynamic' p='5' toStatus='falling' toScript='down-right' toVx='True'><action pic='shime13.png' useTime='100' XMoveMax='-5' XMoveMin='-2'></action></script></status></root>"""
+        return """<?xml version="1.0" encoding="utf-8"?><root version='2'><status name='catch'>
+        <script name='general-left' type='static'><action pic='shime5.png'></action></script>
+        <script name='throw-left' type='static'><action pic='shime7.png'></action></script>
+        <script name='general-right' type='static'><action pic='shime5.png' Mirror-X='True'>
+        </action></script><script name='throw-right' type='static'><action pic='shime7.png' Mirror-X='True'>
+        </action></script></status><status name='falling'><script name='up-left' type='static'><action pic='shime5.png'>
+        </action></script><script name='down-left' type='static'><action pic='shime4.png'></action></script>
+        <script name='up-right' type='static'><action pic='shime5.png' Mirror-X='True'></action></script>
+        <script name='down-right' type='static'><action pic='shime4.png' Mirror-X='True'></action></script></status>
+        <status name='floor'><script name='general-left' type='static' pOut='100'><action pic='shime1.png'></action></script>
+        <script name='general-right' type='static' pOut='100'><action pic='shime1.png' Mirror-X='True'></action></script>
+        <script name='toFloor-left' type='dynamic'><action pic='shime20.png' useTime='400'></action>
+        <action pic='shime18.png' useTime='200'></action></script><script name='toFloor-right' type='dynamic'>
+        <action pic='shime20.png' useTime='400' Mirror-X='True'></action><action pic='shime18.png' useTime='200' Mirror-X='True'>
+        </action></script><script name='walk-left' type='dynamic' repeatTimeMax='20' repeatTimeMin='1' p='20'>
+        <action pic='shime2.png' useTime='300' XMoveMax='-1' XMoveMin='-1'></action><action pic='shime3.png' useTime='300' XMoveMax='-1' XMoveMin='-1'>
+        </action></script><script name='walk-right' type='dynamic' repeatTimeMax='20' repeatTimeMin='1' p='20'>
+        <action pic='shime2.png' useTime='300' XMoveMax='1' XMoveMin='1' Mirror-X='True'></action>
+        <action pic='shime3.png' useTime='300' XMoveMax='1' XMoveMin='1' Mirror-X='True'></action></script>
+        <script name='Sit' type='dynamic' p='10'><action pic='shime18.png' useTime='300'></action><action pic='shime11.png' useTime='3000'>
+        </action></script><script name='sleeplySit' type='dynamic' p='10'><action pic='shime18.png' useTime='300'></action>
+        <action pic='shime20.png' useTime='1000'></action><action pic='shime30.png' useTime='1500'></action><action pic='shime31.png' useTime='500'>
+        </action><action pic='shime32.png' useTime='500'></action><action pic='shime30.png' useTime='1500'></action>
+        <action pic='shime31.png' useTime='500'></action><action pic='shime32.png' useTime='500'></action><action pic='shime32.png' useTime='3000'>
+        </action><action pic='shime33.png' useTime='3000'></action><action pic='shime32.png' useTime='3000'></action>
+        <action pic='shime33.png' useTime='3000'></action><action pic='shime20.png' useTime='1000'></action><action pic='shime18.png' useTime='300'>
+        </action></script><script name='jump' type='dynamic' p='10' repeatTimeMax='3' repeatTimeMin='1'><action pic='shime49.png' useTime='300'>
+        </action><action pic='shime47.png' useTime='100' XMoveMax='-2' XMoveMin='-2' YMoveMax='-1' YMoveMin='-1'></action>
+        <action pic='shime47.png' useTime='50' XMoveMax='-2' XMoveMin='-2' YMoveMax='-0.5' YMoveMin='-0.5'></action>
+        <action pic='shime47.png' useTime='50' XMoveMax='-2' XMoveMin='-2' YMoveMax='0.5' YMoveMin='0.5'></action>
+        <action pic='shime47.png' useTime='100' XMoveMax='-2' XMoveMin='-2' YMoveMax='1' YMoveMin='1'></action>
+        <action pic='shime48.png' useTime='300'></action></script><script name='fly-left' type='dynamic' p='2'>
+        <action pic='shime49.png' useTime='1000'></action><action pic='shime47.png' useTime='200' XMoveMax='-2' XMoveMin='-2' YMoveMax='-1' YMoveMin='-1'>
+        </action><action pic='shime22.png' useTime='1000000' XMoveMax='-5' XMoveMin='-5' YMoveMax='-2' YMoveMin='-2'></action>
+        </script><script name='fly-right' type='dynamic' p='2'><action pic='shime49.png' useTime='1000' Mirror-X='True'></action>
+        <action pic='shime47.png' useTime='200' XMoveMax='2' XMoveMin='2' YMoveMax='-1' YMoveMin='-1' Mirror-X='True'>
+        </action><action pic='shime22.png' useTime='1000000' XMoveMax='5' XMoveMin='5' YMoveMax='-2' YMoveMin='-2' Mirror-X='True'>
+        </action></script></status><status name='wall-left'><script name='general' type='static' pOut='300'><action pic='shime12.png'>
+        </action></script><script name='up' type='dynamic' p='30' repeatTimeMax='6' repeatTimeMin='1' >
+        <action pic='shime13.png' useTime='300' YMoveMax='-1' YMoveMin='-1'></action><action pic='shime14.png' useTime='300' YMoveMax='-1' YMoveMin='-1'>
+        </action></script><script name='down' type='dynamic' p='30' repeatTimeMax='5' repeatTimeMin='1' >
+        <action pic='shime13.png' useTime='300' YMoveMax='1' YMoveMin='1'></action><action pic='shime14.png' useTime='300' YMoveMax='1' YMoveMin='1'>
+        </action></script><script name='jump' type='dynamic' p='5' toStatus='falling' toScript='down-left' toVx='True'>
+        <action pic='shime13.png' useTime='100' XMoveMax='5' XMoveMin='2'></action></script></status><status name='wall-right'>
+        <script name='general' type='static' pOut='300'><action pic='shime12.png' Mirror-X='True'></action></script>
+        <script name='up' type='dynamic' p='30' repeatTimeMax='6' repeatTimeMin='1' >
+        <action pic='shime13.png' useTime='300' YMoveMax='-1' YMoveMin='-1' Mirror-X='True'>
+        </action><action pic='shime14.png' useTime='300' YMoveMax='-1' YMoveMin='-1' Mirror-X='True'></action></script>
+        <script name='down' type='dynamic' p='30' repeatTimeMax='5' repeatTimeMin='1' >
+        <action pic='shime13.png' useTime='300' YMoveMax='1' YMoveMin='1' Mirror-X='True'>
+        </action><action pic='shime14.png' useTime='300' YMoveMax='1' YMoveMin='1' Mirror-X='True'></action>
+        </script><script name='jump' type='dynamic' p='5' toStatus='falling' toScript='down-right' toVx='True'>
+        <action pic='shime13.png' useTime='100' XMoveMax='-5' XMoveMin='-2'></action></script></status></root>"""
     
     
     #自定义：实现窗体透明    
@@ -213,8 +266,8 @@ class myDesktopPet(QWidget):
 
     #自定义：更新工作区大小
     def updateWorkArea(self):
-        h=win32gui.FindWindow("Shell_TrayWnd","")
-        r=win32gui.GetWindowRect(h)
+        tray_window=win32gui.FindWindow("Shell_TrayWnd","")
+        r=win32gui.GetWindowRect(tray_window)
         screen=QDesktopWidget().screenGeometry()
 
         self.workArea['x']['a']=0
@@ -349,7 +402,7 @@ class myDesktopPet(QWidget):
         
         size =  self.geometry()
         if (size.top()<self.workArea['y']['b']) and (size.left()>self.workArea['x']['a']-64) and (size.left()<(self.workArea['x']['b']-64)):
-            #尼玛忘了为什么要写这个
+            #这个应该是走着走着摔倒
             if self.petStatus['Status']!='falling' and self.petStatus['Status']!='floor':
                 #self.move(size.left(),self.workArea['y']['b'])
                 if self.petStatus['Vx']>0:
@@ -569,6 +622,8 @@ def trayIcon_JustOne():
             f=False
         else:
             petList[i]="";
+    while len(petList)>1:
+        petList.pop()
 
 
 #清空所有
@@ -576,7 +631,7 @@ def trayIcon_ClearAll():
     for i in range(len(petList)):
         petList[i]=""
     while len(petList)>0:
-        del petList[0]
+        petList.pop()
     
 
 def main():
