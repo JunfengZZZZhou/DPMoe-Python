@@ -397,12 +397,12 @@ class myDesktopPet(QWidget):
         #      +' '+self.petStatus['Script']\
         #      +' STEP:'+str(self.petStatus['Step'])
         
-        #判断状态
+        #判断状态 
         self.updateWorkArea()
         
         size =  self.geometry()
         if (size.top()<self.workArea['y']['b']) and (size.left()>self.workArea['x']['a']-64) and (size.left()<(self.workArea['x']['b']-64)):
-            #这个应该是走着走着摔倒
+            #如果在半空中，则掉落
             if self.petStatus['Status']!='falling' and self.petStatus['Status']!='floor':
                 #self.move(size.left(),self.workArea['y']['b'])
                 if self.petStatus['Vx']>0:
@@ -436,22 +436,14 @@ class myDesktopPet(QWidget):
             self.petStatus['Vy']=self.petStatus['Vy']+0.3
             
             #判断出上界-清空Vx
-            if size.top()<self.workArea['x']['a']-64:
-                self.petStatus['Vx']=0
+            if size.top()<self.workArea['y']['a']-64:
+                self.petStatus['Vx']=0       
                 
-            #判断上升or下降
-            if self.petStatus['Vy']>=0:
-                #下降
-                if self.petStatus['Vx']<0:
-                    self.setPic('falling','down-left')
-                else:
-                    self.setPic('falling','down-right')
+            #判断向左or向右
+            if self.petStatus['Vx']<0:
+                self.setPic('falling','down-left')
             else:
-                #上升
-                if self.petStatus['Vx']<0:
-                    self.setPic('falling','up-left')
-                else:
-                    self.setPic('falling','up-right')
+                self.setPic('falling','down-right')
 
             #边缘判断
             if size.top()+self.petStatus['Vy']>self.workArea['y']['b']-128:
@@ -518,7 +510,7 @@ class myDesktopPet(QWidget):
         flag=False
 
         iPic=0
-        for i in node.getchildren():
+        for i in node:
             
             if nowTime<=actionTime and nowTime>=actionTime-self.timerInterval:
                 #达到某一新action
@@ -616,20 +608,13 @@ def trayIcon_AddOne():
     
 #只留一个
 def trayIcon_JustOne():
-    f=True
-    for i in range(len(petList)):
-        if f:
-            f=False
-        else:
-            petList[i]="";
+    
     while len(petList)>1:
         petList.pop()
 
 
 #清空所有
 def trayIcon_ClearAll():
-    for i in range(len(petList)):
-        petList[i]=""
     while len(petList)>0:
         petList.pop()
     
