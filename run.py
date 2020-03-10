@@ -30,7 +30,7 @@ class myMain(QWidget):
     
         #系统托盘图标
         self.trayIcon = QSystemTrayIcon(self)
-        icon = QtGui.QIcon('img/icon.png')
+        icon = QtGui.QIcon('Psyduck/icon.png')
         self.trayIcon.setIcon(icon)
         self.trayIcon.show()
         #单击图标事件
@@ -74,12 +74,14 @@ class myDesktopPet(QWidget):
     def __init__(self, parent=None):
         QWidget.__init__(self, parent)
 
+        #设置文件、图片路径
+        self.fileroot = 'Psyduck'
+        
         #加载剧本
         self.loadScript()
 
         #临时对象
         self.image=QImage()
-
         
         #设置状态
         self.petStatus={'Status':0,'Script':0,'Step':-1,'Vx':0,'Vy':0,'ToRepeat':0,'NowPic':'','Mirror-X':False,'Mirror-Y':False}
@@ -113,7 +115,7 @@ class myDesktopPet(QWidget):
         self.lbl = QLabel(self)
         self.lbl.move(0, 0)
 
-        self.setPic('falling','up-left')
+        self.setPic('falling','down-left')
         
         #不许动功能标记
         self.doNotMove=False
@@ -154,12 +156,15 @@ class myDesktopPet(QWidget):
         else:
             self.doNotMove=True
         self.setPopMenu()
-        self.setPetStatus('falling','up-left')
+        self.setPetStatus('falling','down-left')
 
     #自定义：加载配置文件
     def loadScript(self):
         try:
-            self.scriptXML=open("img\setting.xml","rb").read()
+            filename = self.fileroot+'\\setting.xml'
+            #print(filename)
+            self.scriptXML=open(filename,"rb").read()
+            #print("yes")
         except:
             self.scriptXML=self.loadDefaultScript()
             
@@ -301,12 +306,12 @@ class myDesktopPet(QWidget):
            and self.workAreaOld['x']['b']==self.workArea['x']['b']\
            and self.workAreaOld['y']['a']==self.workArea['y']['a']\
            and self.workAreaOld['y']['b']==self.workArea['y']['b']):
-            self.setPetStatus('falling','up-left')
+            self.setPetStatus('falling','down-left')
         
-        self.workAreaOld['x']['a']=self.workArea['x']['a']
-        self.workAreaOld['x']['b']=self.workArea['x']['b']
-        self.workAreaOld['y']['a']=self.workArea['y']['a']
-        self.workAreaOld['y']['b']=self.workArea['y']['b']
+            self.workAreaOld['x']['a']=self.workArea['x']['a']
+            self.workAreaOld['x']['b']=self.workArea['x']['b']
+            self.workAreaOld['y']['a']=self.workArea['y']['a']
+            self.workAreaOld['y']['b']=self.workArea['y']['b']
 
 
     #自定义：根据场景等更新图片
@@ -328,7 +333,7 @@ class myDesktopPet(QWidget):
             pass
         else:
             img=QImage()
-            img.load('img/'+tmp_node.attrib['pic'])                       
+            img.load(self.fileroot+"\\"+ tmp_node.attrib['pic'])                       
             img=img.mirrored(Mx,My)
             self.lbl.setPixmap(QPixmap.fromImage(img))
 
@@ -339,10 +344,25 @@ class myDesktopPet(QWidget):
 
             
     #鼠标释放
-    def mouseReleaseEvent(self,e):   
+    def mouseReleaseEvent(self,e):
+        #print(self.petStatus['Vx'])
         #重新设置状态
-        self.setPetStatus('falling','up-left')
+        
         self.setPetStatusV()
+        print(self.petStatus['Vx'])
+        if abs(self.petStatus['Vx'])< 15:
+            self.setPetStatus('falling','down-left', self.petStatus['Vx'], self.petStatus['Vy'])
+        else:
+            if self.petStatus['Vx']>0:
+                self.setPic('catch','throw-left')
+                self.setPetStatus('catch','throw-left', self.petStatus['Vx'], self.petStatus['Vy'])
+                        
+            else:
+                self.setPic('catch','throw-right')
+                self.setPetStatus('catch','throw-right', self.petStatus['Vx'], self.petStatus['Vy'])
+        
+            
+            
         #重新开始计时器
         self.timer.start(self.timerInterval, self)
         
@@ -357,18 +377,30 @@ class myDesktopPet(QWidget):
             e.accept()
 
             #记录位置
-            self.setGeometryLog()
             self.setPetStatusV()
-            if abs(self.petStatus['Vx'])<2:
-                if self.petStatus['Vx']<0:
-                    self.setPic('catch','general-left')
-                else:
-                    self.setPic('catch','general-right')
-            else:
-                if self.petStatus['Vx']<0:
+            self.setGeometryLog()
+
+            if abs(self.petStatus['Vx']) > 2:
+                if self.petStatus['Vx']>0:
                     self.setPic('catch','throw-left')
+                    self.setPetStatus('catch','throw-left', self.petStatus['Vx'], self.petStatus['Vy'])
+                    #self.setPic('catch','general-left')
+                        
                 else:
                     self.setPic('catch','throw-right')
+                    self.setPetStatus('catch','throw-right', self.petStatus['Vx'], self.petStatus['Vy'])
+                    #self.setPic('catch','general-right')
+            else:
+                if self.petStatus['Vx']>0:
+                    self.setPic('catch','general-left')
+                    #self.setPetStatus('catch','general-left')
+                    
+                        
+                else:
+                    self.setPic('catch','general-left')
+                    #self.setPetStatus('catch','general-left')
+                    
+                    
             
         
             
@@ -380,13 +412,14 @@ class myDesktopPet(QWidget):
         if e.button() == Qt.LeftButton:
             #加载图片
             self.setPic('catch','general-left')
+            self.setPetStatus('catch','general-left')
             
             self.dragPos=e.globalPos()-self.frameGeometry().topLeft() 
             e.accept()
         if e.button() == Qt.RightButton and self.rightButton == False:
             self.rightButton=True
         #记录位置
-        #self.setGeometryLog()   
+        self.setGeometryLog()
 
 
     #定时器事件
@@ -401,16 +434,9 @@ class myDesktopPet(QWidget):
         self.updateWorkArea()
         
         size =  self.geometry()
-        if (size.top()<self.workArea['y']['b']) and (size.left()>self.workArea['x']['a']-64) and (size.left()<(self.workArea['x']['b']-64)):
-            #如果在半空中，则掉落
-            if self.petStatus['Status']!='falling' and self.petStatus['Status']!='floor':
-                #self.move(size.left(),self.workArea['y']['b'])
-                if self.petStatus['Vx']>0:
-                    self.setPetStatus('falling','down-left')
-                else:
-                    self.setPetStatus('falling','down-right')
-
-        elif size.left()<self.workArea['x']['a']-64:
+                
+                
+        if size.left()<self.workArea['x']['a']-64:
             #侧-左
             if self.petStatus['Status']!='falling':
                 self.move(self.workArea['x']['a']-64,size.top())
@@ -428,7 +454,7 @@ class myDesktopPet(QWidget):
         node=self.root.find(xPathStr)
 
         #掉落------------------------------------------------------------------------            
-        if self.petStatus['Status']=='falling':
+        if self.petStatus['Status'] in ('falling', 'catch'):
             #此处size是折中之策
             size =  self.geometry()
             
@@ -436,15 +462,23 @@ class myDesktopPet(QWidget):
             self.petStatus['Vy']=self.petStatus['Vy']+0.3
             
             #判断出上界-清空Vx
-            if size.top()<self.workArea['y']['a']-64:
+            if size.top()<self.workArea['y']['a']-128:
                 self.petStatus['Vx']=0       
-                
-            #判断向左or向右
-            if self.petStatus['Vx']<0:
-                self.setPic('falling','down-left')
-            else:
-                self.setPic('falling','down-right')
-
+            
+            #下落判定
+            if self.petStatus['Vy'] == 0:
+                if self.petStatus['Vx']<0:
+                    self.setPic('falling','up-left')
+                else:
+                    self.setPic('falling','up-right')
+                    
+            elif self.petStatus['Vy'] > 1:
+                if self.petStatus['Vx']<0:
+                    self.setPic('falling','down-left')
+                else:
+                    self.setPic('falling','down-right')
+            
+            
             #边缘判断
             if size.top()+self.petStatus['Vy']>self.workArea['y']['b']-128:
                 #触地
